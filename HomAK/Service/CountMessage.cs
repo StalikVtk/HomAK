@@ -5,11 +5,11 @@ namespace HomAK.Service
   /// <summary>
   /// Сообщение добавления Count.
   /// </summary>
-  internal class AddCountMessage
+  internal class CountMessage
   {
     public Count Count { get; }
 
-    public AddCountMessage(Count count)
+    public CountMessage(Count count)
     {
       this.Count = count;
     }

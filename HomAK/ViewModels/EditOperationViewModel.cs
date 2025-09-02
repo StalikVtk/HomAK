@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GalaSoft.MvvmLight.Messaging;
 using HomAK.DataAccess;
 using HomAK.Models;
+using HomAK.Service;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -62,6 +64,7 @@ namespace HomAK.ViewModels
       operation.CountId = NewCount.Id;
 
       db.SaveChanges();
+      Messenger.Default.Send(new OperationMessage(operation));
       CloseWindow();
 
     }

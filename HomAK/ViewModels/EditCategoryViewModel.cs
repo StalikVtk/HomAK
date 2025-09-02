@@ -30,7 +30,8 @@ namespace HomAK.ViewModels
     {
       if (string.IsNullOrEmpty(NewNameCategory))
       {
-        MessageBox.Show("Укажите название!", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBox.Show("Укажите название!", "Ошибка!", 
+          MessageBoxButton.OK, MessageBoxImage.Error);
         return;
       }  
 
@@ -39,7 +40,8 @@ namespace HomAK.ViewModels
 
       if (category.Id == selectedCategory.Id && category.Name == NewNameCategory)
       {
-        MessageBox.Show("Категория уже существует!", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBox.Show("Категория уже существует!", "Ошибка!", 
+          MessageBoxButton.OK, MessageBoxImage.Error);
         return;
       }
 
@@ -48,7 +50,6 @@ namespace HomAK.ViewModels
 
       CloseWindow();
     }
-
 
     /// <summary>
     /// Закрыть окно редактирования категории.

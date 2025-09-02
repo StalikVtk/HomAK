@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GalaSoft.MvvmLight.Messaging;
@@ -38,8 +38,6 @@ namespace HomAK.ViewModels
     [ObservableProperty]
     private decimal? itogeExpense;
 
-    public CountViewModel CountVM { get; }
-
     public ObservableCollection<Count> Counts => count.Counts;
 
     public CurrentDateViewModel CurrentDateViewModel
@@ -50,9 +48,8 @@ namespace HomAK.ViewModels
 
     public string CurrentMonthName => CurrentDateViewModel.CurrentMonthName;
 
-    public ICommand PreviousMonthCommand => CurrentDateViewModel.PreviousMonthCommand;
-
-    public ICommand NextMonthCommand => CurrentDateViewModel.NextMonthCommand;
+    public RelayCommand PreviousMonthCommand { get; }
+    public RelayCommand NextMonthCommand { get; }
 
     public RelayCommand DeleteCommand { get; }
 
@@ -71,6 +68,9 @@ namespace HomAK.ViewModels
       var operationsList = db.Operations
         .Include(o => o.Count)
         .Include(o => o.Category)
+        .Where(o => o.DateOperation >= CurrentDateViewModel.GetFirstDayMonth() 
+          && o.DateOperation <= CurrentDateViewModel.GetLastDayMonth()
+          && o.DateOperation.Month == CurrentDateViewModel.GetCurrentMonth())
         .OrderByDescending(o => o.DateOperation)
         .ToList();
 
@@ -78,7 +78,6 @@ namespace HomAK.ViewModels
 
       LoadOperationExpense();
       LoadOperationIncome();
-
     }
 
     /// <summary>
@@ -116,6 +115,13 @@ namespace HomAK.ViewModels
     /// </summary>
     private void EditOperation()
     {
+      if (SelectedOperation == null)
+      {
+        MessageBox.Show("Выберите операцию!", "Ошибка",
+          MessageBoxButton.OK, MessageBoxImage.Error);
+        return;
+      }
+
       EditOperationViewModel editOperationViewModel = new EditOperationViewModel(SelectedOperation);
 
       WindowEditOperation windowEditOperation = new WindowEditOperation(editOperationViewModel);
@@ -140,6 +146,26 @@ namespace HomAK.ViewModels
       UpdateViewOperations();
     }
 
+    /// <summary>
+    /// Переключиться на следующий месяц.
+    /// </summary>
+    private void NextMonth()
+    {
+      CurrentDateViewModel.NextMonth();
+      LoadAllOperetion();
+      UpdateViewOperations();
+    }
+
+    /// <summary>
+    /// Переключиться на предыдущий месяц.
+    /// </summary>
+    private void PreviousMonth()
+    {
+      CurrentDateViewModel.PreviousMonth();
+      LoadAllOperetion();
+      UpdateViewOperations();
+    }
+
     #endregion
 
     #region Конструкторы
@@ -149,13 +175,15 @@ namespace HomAK.ViewModels
       CurrentDateViewModel = new CurrentDateViewModel(DateTime.Now);
       DeleteCommand = new RelayCommand(DeleteOperation);
       EditCommand = new RelayCommand(EditOperation);
+      PreviousMonthCommand = new RelayCommand(PreviousMonth);
+      NextMonthCommand = new RelayCommand(NextMonth);
 
-      Messenger.Default.Register<AddOperationMessage>(this, message =>
+      Messenger.Default.Register<OperationMessage>(this, message =>
       {
         UpdateViewOperations();
       });
 
-      Messenger.Default.Register<AddCountMessage>(this, message =>
+      Messenger.Default.Register<CountMessage>(this, message =>
       {
         OnPropertyChanged(nameof(Counts));
       });
@@ -170,6 +198,8 @@ namespace HomAK.ViewModels
         }
       };
     }
+
     #endregion
+
   }
 }

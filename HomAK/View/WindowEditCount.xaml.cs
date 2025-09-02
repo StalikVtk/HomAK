@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HomAK.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,14 +15,15 @@ using System.Windows.Shapes;
 
 namespace HomAK.View
 {
-    /// <summary>
-    /// Логика взаимодействия для WindowEditCount.xaml
-    /// </summary>
-    public partial class WindowEditCount : Window
+  /// <summary>
+  /// Логика взаимодействия для WindowEditCount.xaml
+  /// </summary>
+  public partial class WindowEditCount : Window
+  {
+    internal WindowEditCount(EditCountViewModel editCountViewModel)
     {
-        public WindowEditCount()
-        {
-            InitializeComponent();
-        }
+      InitializeComponent();
+      DataContext = editCountViewModel;
     }
+  }
 }

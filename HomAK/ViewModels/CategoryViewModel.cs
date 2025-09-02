@@ -67,7 +67,6 @@ namespace HomAK.ViewModels
       windowEditCategory.ShowDialog();
 
       LoadCategories();
-
     }
 
     /// <summary>

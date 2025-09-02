@@ -1,7 +1,5 @@
 ﻿using HomAK.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
 
 namespace HomAK.ViewModels
 {
@@ -30,8 +28,7 @@ namespace HomAK.ViewModels
     /// <summary>
     /// Следующий месяц.
     /// </summary>
-    [RelayCommand]
-    private void NextMonth()
+    public void NextMonth()
     {
       currentDate.AddMonth();
       UpdateDisplayData();
@@ -40,11 +37,30 @@ namespace HomAK.ViewModels
     /// <summary>
     /// Предыдущий месяц.
     /// </summary>
-    [RelayCommand]
-    private void PreviousMonth()
+    public void PreviousMonth()
     {
       currentDate.SubtractMonth();
       UpdateDisplayData();
+    }
+
+    /// <summary>
+    /// Получить первый день установленного месяца.
+    /// </summary>
+    /// <returns>Первый день установленного месяца</returns>
+    public DateTime GetFirstDayMonth()
+    {
+      var date = currentDate.GetSetDate();
+      return new DateTime(date.Year, date.Month, 1);
+    }
+
+    /// <summary>
+    /// Получить последний день установленного месяца.
+    /// </summary>
+    /// <returns>Последний день установленного месяца</returns>
+    public DateTime GetLastDayMonth()
+    {
+      var date = currentDate.GetSetDate();
+      return date.AddMonths(1).AddDays(-1);
     }
 
     /// <summary>

@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using HomAK.View;
 using GalaSoft.MvvmLight.Messaging;
 using HomAK.Service;
+using System.Windows;
 
 namespace HomAK.ViewModels
 {
@@ -64,8 +65,7 @@ namespace HomAK.ViewModels
 
       Counts.Remove(selectedCount);
 
-      OnPropertyChanged(nameof(Counts));
-      OnPropertyChanged(nameof(MainWindowViewModel));
+      Messenger.Default.Send(new CountMessage(SelectedCount));
     }
 
     /// <summary>
@@ -73,16 +73,16 @@ namespace HomAK.ViewModels
     /// </summary>
     private void EditCount()
     {
-      using var db = new ApplicationContext();
-      var countSearchBd = db.Counts.Find(selectedCount.Id);
+      if (SelectedCount == null)
+      {
+        MessageBox.Show("Выберите счет", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        return;
+      }
+      EditCountViewModel editCount = new EditCountViewModel(SelectedCount);
+      WindowEditCount windowEditCount = new WindowEditCount(editCount);
+      windowEditCount.ShowDialog();
 
-      countSearchBd.Name = selectedCount.Name;
-      countSearchBd.Number = selectedCount.Number;
-      countSearchBd.Ammount = selectedCount.Ammount;
-
-      db.SaveChanges();
-
-      OnPropertyChanged(nameof(Counts));
+      Messenger.Default.Send(new CountMessage(SelectedCount));
     }
 
     /// <summary>
@@ -105,7 +105,7 @@ namespace HomAK.ViewModels
       EditCommand = new RelayCommand(EditCount);
       DeleteCommand = new RelayCommand(DeleteCount);
 
-      Messenger.Default.Register<AddCountMessage>(this, message =>
+      Messenger.Default.Register<CountMessage>(this, message =>
       {
         LoadCounts();
       });

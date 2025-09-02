@@ -5,6 +5,7 @@ using HomAK.DataAccess;
 using HomAK.Models;
 using HomAK.Service;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace HomAK.ViewModels
 {
@@ -39,9 +40,9 @@ namespace HomAK.ViewModels
 
     public ObservableCollection<Category> Categories => category.Categories;
 
-    public IRelayCommand AddCommand { get; }
+    public RelayCommand AddCommand { get; }
 
-    public IRelayCommand ClearCommand { get; }
+    public RelayCommand ClearCommand { get; }
 
     #endregion
 
@@ -52,6 +53,27 @@ namespace HomAK.ViewModels
     /// </summary>
     public void AddOperation()
     {
+      if (SelectedCount == null)
+      {
+        MessageBox.Show("Выберите счет!", "Ошибка",
+          MessageBoxButton.OK, MessageBoxImage.Error);
+        return;
+      }
+
+      if (SelectedCategory == null)
+      {
+        MessageBox.Show("Выберите категорию!", "Ошибка",
+          MessageBoxButton.OK, MessageBoxImage.Error);
+        return;
+      }
+
+      if (Amount <= 0)
+      {
+        MessageBox.Show("Сумма должна быть больше 0", "Ошибка",
+          MessageBoxButton.OK, MessageBoxImage.Error);
+        return;
+      }
+
       Operation operation = new Operation();
 
       operation.Id = new Guid();
@@ -66,7 +88,7 @@ namespace HomAK.ViewModels
       db.Operations.Add(operation);
       db.SaveChanges();
 
-      Messenger.Default.Send(new AddOperationMessage(operation));
+      Messenger.Default.Send(new OperationMessage(operation));
 
       ClearFields();
     }

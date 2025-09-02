@@ -5,11 +5,11 @@ namespace HomAK.Service
   /// <summary>
   /// Сообщение добавления Operation.
   /// </summary>
-  internal class AddOperationMessage
+  internal class OperationMessage
   {
     public Operation Operation { get; }
 
-    public AddOperationMessage(Operation operation)
+    public OperationMessage(Operation operation)
     {
       this.Operation = operation;
     }

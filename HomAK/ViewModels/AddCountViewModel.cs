@@ -48,7 +48,7 @@ namespace HomAK.ViewModels
       db.Counts.Add(count);
       db.SaveChanges();
 
-      Messenger.Default.Send(new AddCountMessage(count));
+      Messenger.Default.Send(new CountMessage(count));
       
       ClearFields();
     }

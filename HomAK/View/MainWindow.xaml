@@ -102,9 +102,9 @@
             <StackPanel Orientation="Vertical" Background="White" HorizontalAlignment="Center" Margin="5">
                 <Button Content="Добавить" Margin="5" Click="AddOperation_Click" Width="120"/>
                 <Button Content="Редактировать" Margin="5" Command="{Binding EditCommand}"></Button>
-                <Button Content="Фильтр" Margin="5"></Button>
                 <Button Content="Удалить" Margin="5" Command="{Binding DeleteCommand}"></Button>
                 <Button Content="Отработать" Margin="5"></Button>
+                <Button Content="Фильтр" Margin="5"></Button>
                 <TextBlock Text="{Binding ItogeExpense, StringFormat='Расходы: {0:C2}', ConverterCulture=ru-RU}" Margin="5"/>
                 <TextBlock Text="{Binding ItogIncome, StringFormat='Доходы: {0:C2}', ConverterCulture=ru-RU}" Margin="5"/>
             </StackPanel>
