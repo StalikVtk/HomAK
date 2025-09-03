@@ -40,19 +40,22 @@ namespace HomAK.Models
 
 
     /// <summary>
-    /// Внешний ключ.
+    /// Id категории.
     /// </summary>
     public Guid CategoryId { get; set; }
 
+    /// <summary>
+    /// Категория.
+    /// </summary>
     public Category? Category { get; set; }
 
     /// <summary>
-    /// Id счета
+    /// Id счета.
     /// </summary>
     public Guid CountId { get; set; }
 
     /// <summary>
-    /// Счет
+    /// Счет.
     /// </summary>
     public Count? Count { get; set; }
   }

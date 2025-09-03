@@ -49,7 +49,6 @@ namespace HomAK.DataAccess
     public ApplicationContext()
       : base()
     {
-      //Database.EnsureDeleted();
       Database.EnsureCreated();
     }
 

@@ -38,6 +38,9 @@ namespace HomAK.ViewModels
     [ObservableProperty]
     private decimal? itogeExpense;
 
+    [ObservableProperty]
+    private Count selectedCount;
+
     public ObservableCollection<Count> Counts => count.Counts;
 
     public CurrentDateViewModel CurrentDateViewModel
@@ -49,6 +52,7 @@ namespace HomAK.ViewModels
     public string CurrentMonthName => CurrentDateViewModel.CurrentMonthName;
 
     public RelayCommand PreviousMonthCommand { get; }
+
     public RelayCommand NextMonthCommand { get; }
 
     public RelayCommand DeleteCommand { get; }
@@ -65,6 +69,7 @@ namespace HomAK.ViewModels
     private void LoadAllOperetion()
     {
       using var db = new ApplicationContext();
+
       var operationsList = db.Operations
         .Include(o => o.Count)
         .Include(o => o.Category)
@@ -73,6 +78,13 @@ namespace HomAK.ViewModels
           && o.DateOperation.Month == CurrentDateViewModel.GetCurrentMonth())
         .OrderByDescending(o => o.DateOperation)
         .ToList();
+
+      if (SelectedCount != null)
+      {
+        operationsList = operationsList
+          .Where(o => o.Count.Id == SelectedCount.Id)
+          .ToList();
+      }
 
       Operations = new ObservableCollection<Operation>(operationsList);
 
@@ -166,17 +178,26 @@ namespace HomAK.ViewModels
       UpdateViewOperations();
     }
 
+    partial void OnSelectedCountChanged(Count? oldValue, Count? newValue)
+    {
+      if (newValue != null)
+      {
+        LoadAllOperetion();
+      }
+    }
+
     #endregion
 
     #region Конструкторы
 
     public MainWindowViewModel()
     {
-      CurrentDateViewModel = new CurrentDateViewModel(DateTime.Now);
-      DeleteCommand = new RelayCommand(DeleteOperation);
-      EditCommand = new RelayCommand(EditOperation);
-      PreviousMonthCommand = new RelayCommand(PreviousMonth);
-      NextMonthCommand = new RelayCommand(NextMonth);
+      this.CurrentDateViewModel = new CurrentDateViewModel(DateTime.Now);
+      this.DeleteCommand = new RelayCommand(DeleteOperation);
+      this.EditCommand = new RelayCommand(EditOperation);
+      this.PreviousMonthCommand = new RelayCommand(PreviousMonth);
+      this.NextMonthCommand = new RelayCommand(NextMonth);
+      this.SelectedCount = count.Counts.FirstOrDefault();
 
       Messenger.Default.Register<OperationMessage>(this, message =>
       {

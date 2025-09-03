@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:HomAK"
-        xmlns:local="clr-namespace:HomAK.ViewModels" xmlns:converters="clr-namespace:HomAK.Service" d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
+        xmlns:local="clr-namespace:HomAK.ViewModels" xmlns:converters="clr-namespace:HomAK.Service" 
+            d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="HomAK - Home accounting keeping" Height="800" Width="1280"
         WindowStartupLocation="CenterScreen"
@@ -20,13 +21,11 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"></ColumnDefinition>
             <ColumnDefinition MinWidth="850"/>
             <ColumnDefinition Width="155"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        
         <Menu Grid.ColumnSpan="6" Height="Auto" VerticalAlignment="Center" Background="#646f77" Padding="5">
             <MenuItem Header="Файл">
                 <MenuItem Header="Загрузить"></MenuItem>
@@ -53,9 +52,8 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
-
         <Border Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Background="#b5bdc4" Margin="5,5,5,5" CornerRadius="2">
-            <ListBox ItemsSource="{Binding Counts}" Margin="5" Padding="5">
+            <ListBox ItemsSource="{Binding Counts}" Margin="5" Padding="5" SelectedItem="{Binding SelectedCount, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -65,9 +63,8 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            
-        </Border>
 
+        </Border>
         <DataGrid Grid.Column="1" Grid.Row="2" AutoGenerateColumns="False" Padding="5" 
                   Margin="5,5,5,5" ItemsSource="{Binding OperationsExpense}"
                   SelectedItem="{Binding SelectedOperation}"
@@ -82,7 +79,6 @@
                 <DataGridTextColumn Header="Комментарий" Width="150" Binding="{Binding Comment}"/>
             </DataGrid.Columns>
         </DataGrid>
-        
         <DataGrid Grid.Column="1" Grid.Row="3" AutoGenerateColumns="False" Padding="5" 
           Margin="5,5,5,5" ItemsSource="{Binding OperationsIncome}"
           SelectedItem="{Binding SelectedOperation}"
@@ -97,7 +93,6 @@
                 <DataGridTextColumn Header="Комментарий" Width="150" Binding="{Binding Comment}"/>
             </DataGrid.Columns>
         </DataGrid>
-
         <Border Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Margin="5,5,5,5" Background="#b5bdc4" CornerRadius="2">
             <StackPanel Orientation="Vertical" Background="White" HorizontalAlignment="Center" Margin="5">
                 <Button Content="Добавить" Margin="5" Click="AddOperation_Click" Width="120"/>
@@ -109,7 +104,6 @@
                 <TextBlock Text="{Binding ItogIncome, StringFormat='Доходы: {0:C2}', ConverterCulture=ru-RU}" Margin="5"/>
             </StackPanel>
         </Border>
-
         <Border Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="6" Background="#646f77" Margin="0,5,0,5">
             <Grid>
                 <Grid.ColumnDefinitions>

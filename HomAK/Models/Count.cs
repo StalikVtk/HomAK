@@ -37,12 +37,12 @@ namespace HomAK.Models
     public string? Number { get; set; }
 
     /// <summary>
-    /// Операции
+    /// Операции.
     /// </summary>
     public List<Operation> Operations { get; set; } = new();
 
     /// <summary>
-    /// Коневерты
+    /// Конверты.
     /// </summary>
     public List<Envelope> Envelopes { get; set; } = new();
 
