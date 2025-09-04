@@ -1,11 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using ClosedXML.Excel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GalaSoft.MvvmLight.Messaging;
 using HomAK.Models;
 using HomAK.Service;
 using HomAK.View;
+using Microsoft.Win32;
 
 namespace HomAK.ViewModels
 {
@@ -46,6 +48,8 @@ namespace HomAK.ViewModels
     public RelayCommand EditCommand { get; }
 
     public RelayCommand AddCommand { get; }
+
+    public RelayCommand ExportToExcelCommand { get; }
 
     #endregion
 
@@ -162,6 +166,97 @@ namespace HomAK.ViewModels
       }
     }
 
+    private void ExportToExcelOperation()
+    {
+      if (OperationViewModel == null ||
+        OperationViewModel.OperationsExpense?.Count == 0 &&
+        OperationViewModel.OperationsIncome?.Count == 0)
+      {
+        MessageBox.Show("Нет операций для экспорта", "Ошибка",
+                   MessageBoxButton.OK, MessageBoxImage.Stop);
+        return;
+      }
+
+      var saveFile = new SaveFileDialog
+      {
+        Filter = "Excel Files|*.xlsx",
+        FileName = $"Операции_{CurrentDateViewModel.CurrentMonthName}.xlsx",
+        Title = "Сохранить файл"
+      };
+
+      if (saveFile.ShowDialog() == true)
+      {
+        CreateExcelFile(saveFile.FileName);
+        MessageBox.Show("Даннные экспортированы в Excel", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+      }
+    }
+
+    private void CreateExcelFile(string filePath)
+    {
+      using var workBook = new XLWorkbook();
+
+      if (OperationViewModel.OperationsExpense?.Count > 0)
+      {
+        CreateWorkSheet(workBook, "Расходы", OperationViewModel.OperationsExpense);
+      }
+
+      if (OperationViewModel.OperationsIncome?.Count > 0)
+      {
+        CreateWorkSheet(workBook, "Доходы", OperationViewModel.OperationsIncome);
+      }
+
+      CreatSumWorkSheet(workBook);
+
+      workBook.SaveAs(filePath);
+    }
+
+    private void CreateWorkSheet(XLWorkbook workbook, string workSheetName, ObservableCollection<Operation> operations)
+    {
+      var workSheet = workbook.Worksheets.Add(workSheetName);
+
+      workSheet.Cell(1, 1).Value = "Дата операции";
+      workSheet.Cell(1, 2).Value = "Сумма";
+      workSheet.Cell(1, 3).Value = "Категория";
+      workSheet.Cell(1, 4).Value = "Счет";
+      workSheet.Cell(1, 5).Value = "Вид операции";
+      workSheet.Cell(1, 6).Value = "Комментарий";
+
+      for (int i = 0; i < operations.Count; i++)
+      {
+        var curOperation = operations[i];
+        var row = i + 2;
+
+        workSheet.Cell(row, 1).Value = curOperation.DateOperation;
+        workSheet.Cell(row, 1).Style.DateFormat.Format = "dd.MM.yyyy";
+
+        workSheet.Cell(row, 2).Value = curOperation.Amount;
+        workSheet.Cell(row, 3).Value = curOperation.Category?.Name;
+        workSheet.Cell(row, 4).Value = curOperation.Count?.Number;
+        workSheet.Cell(row, 5).Value = curOperation.TypeOperation == OperationType.Income ? "Приход" : "Расход";
+        workSheet.Cell(row, 6).Value = curOperation.Comment;
+
+        workSheet.Columns().AdjustToContents();
+      }
+    }
+
+    private void CreatSumWorkSheet(XLWorkbook workbook)
+    {
+      var workSheet = workbook.Worksheets.Add("Итоги");
+
+      workSheet.Cell(1, 1).Value = "Отчет";
+
+      workSheet.Cell(3, 1).Value = "Месяц";
+      workSheet.Cell(3, 2).Value = $"{CurrentDateViewModel.CurrentMonthName}";
+
+      workSheet.Cell(5, 1).Value = "Общие расходы";
+      workSheet.Cell(5, 2).Value = OperationViewModel.SumExpense ?? 0;
+
+      workSheet.Cell(7, 1).Value = "Общие доходы";
+      workSheet.Cell(7, 2).Value = OperationViewModel.SumIncome ?? 0;
+
+      workSheet.Columns().AdjustToContents();
+    }
+
     #endregion
 
     #region Конструкторы
@@ -180,6 +275,7 @@ namespace HomAK.ViewModels
       this.EditCommand = new RelayCommand(EditCurrentOperation);
       this.PreviousMonthCommand = new RelayCommand(PreviousMonth);
       this.NextMonthCommand = new RelayCommand(NextMonth);
+      this.ExportToExcelCommand = new RelayCommand(ExportToExcelOperation);
 
       Messenger.Default.Register<OperationMessage>(this, message =>
       {

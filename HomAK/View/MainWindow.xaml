@@ -98,7 +98,7 @@
                 <Button Content="Добавить" Margin="5" Command="{Binding AddCommand}" Width="120"/>
                 <Button Content="Редактировать" Margin="5" Command="{Binding EditCommand}"/>
                 <Button Content="Удалить" Margin="5" Command="{Binding DeleteCommand}"/>
-                <Button Content="Отработать" Margin="5"/>
+                <Button Content="Экспорт" Margin="5" Command="{Binding ExportToExcelCommand}"/>
                 <Button Content="Фильтр" Margin="5"/>
                 <TextBlock Text="{Binding OperationViewModel.SumExpense, StringFormat='Расходы: {0:C2}', ConverterCulture=ru-RU}" Margin="5"/>
                 <TextBlock Text="{Binding OperationViewModel.SumIncome, StringFormat='Доходы: {0:C2}', ConverterCulture=ru-RU}" Margin="5"/>
