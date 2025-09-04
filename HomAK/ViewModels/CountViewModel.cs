@@ -109,7 +109,6 @@ namespace HomAK.ViewModels
       {
         LoadCounts();
       });
-     
       LoadCounts();
     }
 

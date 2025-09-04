@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace HomAK.ViewModels
 {
-  internal partial class CurrentDateViewModel : ObservableObject
+  internal partial class currentDateViewModel : ObservableObject
   {
 
     #region Поля
@@ -76,7 +76,7 @@ namespace HomAK.ViewModels
 
     #region Конструкторы
 
-    public CurrentDateViewModel(DateTime initDate)
+    public currentDateViewModel(DateTime initDate)
     {
       currentDate = new CurrentDate(initDate);
       UpdateDisplayData();

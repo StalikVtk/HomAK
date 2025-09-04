@@ -3,11 +3,9 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GalaSoft.MvvmLight.Messaging;
-using HomAK.DataAccess;
 using HomAK.Models;
 using HomAK.Service;
 using HomAK.View;
-using Microsoft.EntityFrameworkCore;
 
 namespace HomAK.ViewModels
 {
@@ -18,32 +16,20 @@ namespace HomAK.ViewModels
 
     private readonly CountViewModel count = new CountViewModel();
 
-    private CurrentDateViewModel currentDate;
+    private currentDateViewModel currentDate;
 
     [ObservableProperty]
-    private ObservableCollection<Operation>? operations;
-
-    [ObservableProperty]
-    private ObservableCollection<Operation>? operationsExpense;
-
-    [ObservableProperty]
-    private ObservableCollection<Operation>? operationsIncome;
+    private OperationViewModel operationViewModel;
 
     [ObservableProperty]
     private Operation selectedOperation;
-
-    [ObservableProperty]
-    private decimal? itogIncome;
-
-    [ObservableProperty]
-    private decimal? itogeExpense;
 
     [ObservableProperty]
     private Count selectedCount;
 
     public ObservableCollection<Count> Counts => count.Counts;
 
-    public CurrentDateViewModel CurrentDateViewModel
+    public currentDateViewModel CurrentDateViewModel
     {
       get => currentDate;
       set => SetProperty(ref currentDate, value);
@@ -64,68 +50,17 @@ namespace HomAK.ViewModels
     #region Методы
 
     /// <summary>
-    /// Загрузить операции.
+    /// Загрузить операции по видам.
     /// </summary>
-    private void LoadAllOperetion()
+    private void LoadAllOperation()
     {
-      using var db = new ApplicationContext();
-
-      var operationsList = db.Operations
-        .Include(o => o.Count)
-        .Include(o => o.Category)
-        .Where(o => o.DateOperation >= CurrentDateViewModel.GetFirstDayMonth() 
-          && o.DateOperation <= CurrentDateViewModel.GetLastDayMonth()
-          && o.DateOperation.Month == CurrentDateViewModel.GetCurrentMonth())
-        .OrderByDescending(o => o.DateOperation)
-        .ToList();
-
-      if (SelectedCount != null)
-      {
-        operationsList = operationsList
-          .Where(o => o.Count.Id == SelectedCount.Id)
-          .ToList();
-      }
-
-      Operations = new ObservableCollection<Operation>(operationsList);
-
-      LoadOperationExpense();
-      LoadOperationIncome();
+      OperationViewModel = new OperationViewModel(SelectedCount, CurrentDateViewModel);
     }
 
     /// <summary>
-    /// Загрузить операции с типом Расход.
+    /// Редактировать текущую операцию.
     /// </summary>
-    private void LoadOperationExpense() 
-    {
-      OperationsExpense = new ObservableCollection<Operation>(
-        Operations.Where(o => o.TypeOperation == OperationType.Expense));
-
-      ItogeExpense = OperationsExpense.Sum(o => o.Amount);
-    }
-
-    /// <summary>
-    /// Загрузить операции с типом Приход.
-    /// </summary>
-    private void LoadOperationIncome() 
-    {
-      OperationsIncome = new ObservableCollection<Operation>(
-        Operations.Where(o => o.TypeOperation == OperationType.Income));
-
-      ItogIncome = OperationsIncome.Sum(o => o.Amount);
-    }
-
-    /// <summary>
-    /// Обновить представление главной страницы.
-    /// </summary>
-    private void UpdateViewOperations()
-    {
-      LoadAllOperetion();
-    }
-
-    /// <summary>
-    /// Редактировать операцию.
-    /// </summary>
-    private void EditOperation()
+    private void EditCurrentOperation()
     {
       if (SelectedOperation == null)
       {
@@ -139,23 +74,25 @@ namespace HomAK.ViewModels
       WindowEditOperation windowEditOperation = new WindowEditOperation(editOperationViewModel);
 
       windowEditOperation.ShowDialog();
+
+      LoadAllOperation();
     }
 
     /// <summary>
-    /// Удалить операцию.
+    /// Удалить текущую операцию.
     /// </summary>
-    private void DeleteOperation()
+    private void DeleteCurrentOperation()
     {
       if (SelectedOperation == null)
+      {
+        MessageBox.Show("Выберите операцию!", "Ошибка",
+          MessageBoxButton.OK, MessageBoxImage.Error);
         return;
+      }
 
-      using var db = new ApplicationContext();
-      db.Operations.Remove(SelectedOperation);
-      db.SaveChanges();
+      OperationViewModel.DeleteOperation(SelectedOperation);
 
-      Operations.Remove(SelectedOperation);
-
-      UpdateViewOperations();
+      LoadAllOperation();
     }
 
     /// <summary>
@@ -164,8 +101,7 @@ namespace HomAK.ViewModels
     private void NextMonth()
     {
       CurrentDateViewModel.NextMonth();
-      LoadAllOperetion();
-      UpdateViewOperations();
+      LoadAllOperation();
     }
 
     /// <summary>
@@ -174,15 +110,19 @@ namespace HomAK.ViewModels
     private void PreviousMonth()
     {
       CurrentDateViewModel.PreviousMonth();
-      LoadAllOperetion();
-      UpdateViewOperations();
+      LoadAllOperation();
     }
 
+    /// <summary>
+    /// Устновить выбранный счет.
+    /// </summary>
+    /// <param name="oldValue"></param>
+    /// <param name="newValue"></param>
     partial void OnSelectedCountChanged(Count? oldValue, Count? newValue)
     {
       if (newValue != null)
       {
-        LoadAllOperetion();
+        LoadAllOperation();
       }
     }
 
@@ -192,24 +132,26 @@ namespace HomAK.ViewModels
 
     public MainWindowViewModel()
     {
-      this.CurrentDateViewModel = new CurrentDateViewModel(DateTime.Now);
-      this.DeleteCommand = new RelayCommand(DeleteOperation);
-      this.EditCommand = new RelayCommand(EditOperation);
-      this.PreviousMonthCommand = new RelayCommand(PreviousMonth);
-      this.NextMonthCommand = new RelayCommand(NextMonth);
+      this.CurrentDateViewModel = new currentDateViewModel(DateTime.Now);
       this.SelectedCount = count.Counts.FirstOrDefault();
 
+      this.OperationViewModel = new OperationViewModel(SelectedCount, CurrentDateViewModel);
+
+      this.DeleteCommand = new RelayCommand(DeleteCurrentOperation);
+      this.EditCommand = new RelayCommand(EditCurrentOperation);
+      this.PreviousMonthCommand = new RelayCommand(PreviousMonth);
+      this.NextMonthCommand = new RelayCommand(NextMonth);
+      
       Messenger.Default.Register<OperationMessage>(this, message =>
       {
-        UpdateViewOperations();
+        LoadAllOperation();
       });
 
       Messenger.Default.Register<CountMessage>(this, message =>
       {
         OnPropertyChanged(nameof(Counts));
+        LoadAllOperation();
       });
-
-      LoadAllOperetion();
 
       CurrentDateViewModel.PropertyChanged += (s, e) =>
       {
