@@ -4,7 +4,6 @@ using GalaSoft.MvvmLight.Messaging;
 using HomAK.DataAccess;
 using HomAK.Models;
 using HomAK.Service;
-using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace HomAK.ViewModels

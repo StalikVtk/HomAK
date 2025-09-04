@@ -1,27 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HomAK.ViewModels;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace HomAK.View
 {
-    /// <summary>
-    /// Логика взаимодействия для WindowOperation.xaml
-    /// </summary>
-    public partial class WindowAddOperation : Window
+  /// <summary>
+  /// Логика взаимодействия для WindowOperation.xaml
+  /// </summary>
+  public partial class WindowAddOperation : Window
+  {
+    internal WindowAddOperation(AddOperationViewModel viewModel)
     {
-        public WindowAddOperation()
-        {
-            InitializeComponent();
-        }
+      InitializeComponent();
+      DataContext = viewModel;
     }
+  }
 }

@@ -14,8 +14,6 @@ namespace HomAK.ViewModels
 
     #region Поля
 
-    private readonly CountViewModel count = new CountViewModel();
-
     private readonly CategoryViewModel category = new CategoryViewModel();
 
     [ObservableProperty]
@@ -36,7 +34,7 @@ namespace HomAK.ViewModels
     [ObservableProperty]
     private string comment;
 
-    public ObservableCollection<Count> Counts => count.Counts;
+    public ObservableCollection<Count> Counts { get; }
 
     public ObservableCollection<Category> Categories => category.Categories;
 
@@ -74,15 +72,23 @@ namespace HomAK.ViewModels
         return;
       }
 
+      if (TypeOperation(SelectedTypeOperation) == OperationType.Expense && 
+        SelectedCount.CurrentAmmount - Amount < decimal.Zero)
+      { 
+        MessageBox.Show("Недостаточно средств на счете!", "Ошибка",
+          MessageBoxButton.OK, MessageBoxImage.Error);
+        return;
+      }
+
       Operation operation = new Operation();
 
       operation.Id = new Guid();
-      operation.CountId= selectedCount.Id;
-      operation.DateOperation = operationDate;
-      operation.CategoryId = selectedCategory.Id;
-      operation.TypeOperation = TypeOperation(selectedTypeOperation);
-      operation.Amount = amount;
-      operation.Comment = comment;
+      operation.CountId= SelectedCount.Id;
+      operation.DateOperation = OperationDate;
+      operation.CategoryId = SelectedCategory.Id;
+      operation.TypeOperation = TypeOperation(SelectedTypeOperation);
+      operation.Amount = Amount;
+      operation.Comment = Comment;
 
       using var db = new ApplicationContext();
       db.Operations.Add(operation);
@@ -121,10 +127,11 @@ namespace HomAK.ViewModels
 
     #region Конструктор
 
-    public AddOperationViewModel()
+    public AddOperationViewModel(ObservableCollection<Count> counts)
     {
-      AddCommand = new RelayCommand(AddOperation);
-      ClearCommand = new RelayCommand(ClearFields);
+      this.Counts = counts;
+      this.AddCommand = new RelayCommand(AddOperation);
+      this.ClearCommand = new RelayCommand(ClearFields);
     }
 
     #endregion

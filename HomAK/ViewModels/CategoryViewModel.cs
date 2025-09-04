@@ -35,17 +35,17 @@ namespace HomAK.ViewModels
     /// <summary>
     /// Добавление категории.
     /// </summary>
-    public IRelayCommand AddCommand { get; }
+    public RelayCommand AddCommand { get; }
 
     /// <summary>
     /// Редактирование категории.
     /// </summary>
-    public IRelayCommand EditCommand { get; }
+    public RelayCommand EditCommand { get; }
 
     /// <summary>
     /// Удаление категории.
     /// </summary>
-    public IRelayCommand DeleteCommand { get; }
+    public RelayCommand DeleteCommand { get; }
 
     #endregion
 

@@ -29,6 +29,9 @@ namespace HomAK.Models
     [Required]
     public decimal Ammount { get; set; }
 
+    [NotMapped]
+    public decimal CurrentAmmount { get; set; }
+
     /// <summary>
     /// Номер.
     /// </summary>

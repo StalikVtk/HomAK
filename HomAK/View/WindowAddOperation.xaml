@@ -7,9 +7,6 @@
         WindowStartupLocation="CenterScreen"
         Background="#e1e4e8"
         Title="Добавить операцию" Height="450" Width="320">
-    <Window.DataContext>
-        <vm:AddOperationViewModel/>
-    </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>

@@ -45,6 +45,8 @@ namespace HomAK.ViewModels
 
     public RelayCommand EditCommand { get; }
 
+    public RelayCommand AddCommand { get; }
+
     #endregion
 
     #region Методы
@@ -55,6 +57,26 @@ namespace HomAK.ViewModels
     private void LoadAllOperation()
     {
       OperationViewModel = new OperationViewModel(SelectedCount, CurrentDateViewModel);
+      GetCurrentBalance();
+    }
+
+    /// <summary>
+    /// Получить текущий баланс счета.
+    /// </summary>
+    private void GetCurrentBalance()
+    {
+      var TempCounts = Counts.ToList();
+      Counts.Clear();
+      for (var itemCount = 0; itemCount < TempCounts.Count; itemCount++)
+      {
+        var CurrentCount = TempCounts[itemCount];
+        var OperationsCount = new OperationViewModel(CurrentCount, CurrentDateViewModel);
+        CurrentCount.CurrentAmmount = CurrentCount.Ammount + 
+          (OperationsCount.SumIncome ?? 0) - (OperationsCount.SumExpense ?? 0);
+
+        Counts.Add(CurrentCount);
+      }
+      OnPropertyChanged(nameof(Counts));
     }
 
     /// <summary>
@@ -79,6 +101,19 @@ namespace HomAK.ViewModels
     }
 
     /// <summary>
+    /// Добавить операцию.
+    /// </summary>
+    private void AddOperation()
+    {
+      var addOperationViewModel = new AddOperationViewModel(Counts);
+      WindowAddOperation windowAddOperation = new WindowAddOperation(addOperationViewModel);
+      windowAddOperation.Owner = Application.Current.MainWindow;
+      windowAddOperation.ShowDialog();
+
+      GetCurrentBalance();
+    }
+
+    /// <summary>
     /// Удалить текущую операцию.
     /// </summary>
     private void DeleteCurrentOperation()
@@ -93,6 +128,7 @@ namespace HomAK.ViewModels
       OperationViewModel.DeleteOperation(SelectedOperation);
 
       LoadAllOperation();
+      GetCurrentBalance();
     }
 
     /// <summary>
@@ -135,13 +171,16 @@ namespace HomAK.ViewModels
       this.CurrentDateViewModel = new currentDateViewModel(DateTime.Now);
       this.SelectedCount = count.Counts.FirstOrDefault();
 
+      GetCurrentBalance();
+
       this.OperationViewModel = new OperationViewModel(SelectedCount, CurrentDateViewModel);
 
+      this.AddCommand = new RelayCommand(AddOperation);
       this.DeleteCommand = new RelayCommand(DeleteCurrentOperation);
       this.EditCommand = new RelayCommand(EditCurrentOperation);
       this.PreviousMonthCommand = new RelayCommand(PreviousMonth);
       this.NextMonthCommand = new RelayCommand(NextMonth);
-      
+
       Messenger.Default.Register<OperationMessage>(this, message =>
       {
         LoadAllOperation();
@@ -149,7 +188,6 @@ namespace HomAK.ViewModels
 
       Messenger.Default.Register<CountMessage>(this, message =>
       {
-        OnPropertyChanged(nameof(Counts));
         LoadAllOperation();
       });
 

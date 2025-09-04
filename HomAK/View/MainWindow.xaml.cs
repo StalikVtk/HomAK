@@ -25,12 +25,6 @@ namespace HomAK
       WindowCount.Show();
     }
 
-    private void AddOperation_Click(object sender, RoutedEventArgs e)
-    {
-      WindowAddOperation WindowAddOperation = new WindowAddOperation();
-      WindowAddOperation.Show();
-    }
-
     private void ExitProgramm(object sender, RoutedEventArgs e)
     {
       var InExit = MessageBox.Show("Выйти?", "Выход", MessageBoxButton.YesNo, MessageBoxImage.Question);

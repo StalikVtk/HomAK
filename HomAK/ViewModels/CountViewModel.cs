@@ -27,17 +27,17 @@ namespace HomAK.ViewModels
     [ObservableProperty]
     private Count selectedCount;
 
-    public IRelayCommand WindowAddCount { get; }
+    public RelayCommand WindowAddCount { get; }
 
     /// <summary>
     /// Команнда редактирования.
     /// </summary>
-    public IRelayCommand EditCommand { get; }
+    public RelayCommand EditCommand { get; }
 
     /// <summary>
     /// Команда удаления.
     /// </summary>
-    public IRelayCommand DeleteCommand { get; }
+    public RelayCommand DeleteCommand { get; }
 
     #endregion
 
@@ -100,10 +100,10 @@ namespace HomAK.ViewModels
 
     public CountViewModel()
     {
-      Counts = new ObservableCollection<Count>();
-      WindowAddCount = new RelayCommand(ShowWindowAddCount);
-      EditCommand = new RelayCommand(EditCount);
-      DeleteCommand = new RelayCommand(DeleteCount);
+      this.Counts = new ObservableCollection<Count>();
+      this.WindowAddCount = new RelayCommand(ShowWindowAddCount);
+      this.EditCommand = new RelayCommand(EditCount);
+      this.DeleteCommand = new RelayCommand(DeleteCount);
 
       Messenger.Default.Register<CountMessage>(this, message =>
       {
